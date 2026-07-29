@@ -1,0 +1,100 @@
+ SQLite format 3@  .v�
+�
+���H
+P
+��##�Etableorder_itemsorder_itemsCREATE TABLE order_items (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id      INTEGER NOT NULL,
+            product_id    INTEGER NOT NULL,
+            quantity      INTEGER NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders(id),
+            FOREIGN KEY (product_id) REFERENCES products(id)
+        )�2�?tableordersordersCREATE TABLE orders (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            customer_id   INTEGER NOT NULL,
+            order_date    TEXT NOT NULL,
+            status        TEXT NOT NULL,
+            FOREIGN KEY (customer_id) REFERENCES customers(id)
+        )�u�=tableproductsproductsCREATE TABLE products (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            name          TEXT NOT NULL,
+            category      TEXT NOT NULL,
+            price         REAL NOT NULL
+        )P++Ytablesqlite_sequencesqlite_sequenceCREATE TABLE sqlite_sequence(name,seq)�(�tablecustomerscustomersCREATE TABLE customers (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            name          TEXT NOT NULL,
+            email         TEXT NOT NULL UNIQUE,
+            city          TEXT NOT NULL,
+            signup_date   TEXT NOT NULL
+        )1Eindexsqlite_autoindex_customers_1customers
+	L��A��O
+�
+�
+T
+��^'��|;
+�
+�
+
+D
+	�	�	L=!=#!Zoe Wilsonzoe.wilson27@example.comSan Antonio2023-10-02=%A!Amir Johnsonamir.johnson26@example.comHouston2023-02-027;!Umar Kingumar.king25@example.comHouston2023-11-29?#?#!Fiona Lewisfiona.lewis24@example.comSan Antonio2023-10-049!=!Fiona Kingfiona.king23@example.comSeattle2023-09-08:#?!Will Garciawill.garcia22@example.comAustin2024-10-12=;'!Laura Kimlaura.kim21@example.comSan Francisco2023-10-01?'C!Amir Andersonamir.anderson20@example.comChicago2024-01-15?%A!Marcus Davismarcus.davis19@example.comSan Diego2024-10-12<%A!Carlos Browncarlos.brown18@example.comBoston2023-04-146;!Bob Brownbob.brown17@example.comDenver2023-10-2437!Sam Kimsam.kim16@example.comSeattle2023-03-135;!Amir Hillamir.hill15@example.comMiami2024-01-06>'C!Marcus Garciamarcus.garcia14@example.comDallas2023-10-288!=!Xena Lewisxena.lewis13@example.comDallas2023-05-088
+!=!Tara Davistara.davis12@example.comDenver2023-02-14@#?%!Marcus Chenmarcus.chen11@example.comPhiladelphia2023-12-19A%A#!Yusuf Wilsonyusuf.wilson10@example.comLos Angeles2023-04-05:
+#=!Kevin Daviskevin.davis9@example.comChicago2023-08-09<	%?!Yusuf Nguyenyusuf.nguyen8@example.comSeattle2024-03-08<%?!Oscar Wrightoscar.wright7@example.comPhoenix2023-01-07:9#!Will Kingwill.king6@example.comSan Antonio2023-08-148!;!Alice Kingalice.king5@example.comHouston2024-10-27;%?!George Browngeorge.brown4@example.comDallas2024-09-08=%?!Nina Johnsonnina.johnson3@example.comNew York2023-04-06=#A!Priya Patelpriya.patel.ny@example.comNew York2023-08-19?%C!Marcus Lewismarcus.lewis.ny@example.comNew York2023-05-01=#A!Alice Smithalice.smith.ny@example.comNew York2023-02-14
+�K�
+�$�
+�
+�
+9
+g�
+t�
+�@���
+}�
+V0`���=zoe.wilson27@example.comAamir.johnson26@example.com;umar.king25@example.com?fiona.lewis24@example.com=fiona.king23@example.com?will.garcia22@example.com;laura.kim21@example.comCamir.anderson20@example.comAmarcus.davis19@example.comAcarlos.brown18@example.com;bob.brown17@example.com7sam.kim16@example.com;amir.hill15@example.comCmarcus.garcia14@example.com=xena.lewis13@example.com=tara.davis12@example.com
+?marcus.chen11@example.comAyusuf.wilson10@example.com=kevin.davis9@example.com
+?yusuf.nguyen8@example.com	?oscar.wright7@example.com9will.king6@example.com;alice.king5@example.com?george.brown4@example.com?nina.johnson3@example.comApriya.patel.ny@example.comCmarcus.lewis.ny@example.comA	alice.smith.ny@example.com
+�����#order_items6
+ordersproducts
+customers
+����e0���kM)
+�
+�
+�
+�
+~
+Z
+=
+
+���'Throw BlanketHome@;�p��
+=%Air PurifierHomew +Ceramic Mug SetHome@0�Desk LampHome@6�p��
+=)Vacuum CleanerHome@c��z�H/Cotton Bed SheetsHome'"/Non-stick Pan SetHome@F��Q�%Coffee MakerHome@M��Q�#9Stainless Water BottleFitness'Running ShoesFitnessY#Foam RollerFitness@5�(
+5Resistance Bands SetFitness@/��G�{"5Adjustable DumbbellsFitness�Yoga MatFitness@8�p��
+=+
+3#Phone Charger CableElectronics@#��G�{(	-#Portable SSD 1TBElectronics@V\(�$%#Webcam 1080pElectronics@C��Q�"!#SmartwatchElectronics@b��z�H"/#Bluetooth SpeakerElectronics-3C#Noise Cancelling HeadphonesElectronics@h��z�H!+#27in 4K MonitorElectronicsI!#USB-C HubElectronics@=�p��
+=+3#Mechanical KeyboardElectronics@R�&)#Wireless MouseElectronics@3�p��
+=
+�����}dK0�����v[@%
+
+�
+�
+�
+�
+�
+l
+Q
+6
+
+�!2024-05-23shipped!2023-08-05completed!2024-05-23cancelled!2023-11-06completed!2024-06-13completed!2023-12-02cancelled!2023-05-18completed!2024-01-22completed!2024-05-19shipped!2024-03-25completed!2024-05-22shipped!2023-05-20completed!2023-08-22completed!2024-03-19completed!2024-03-04completed!2024-05-14cancelled!2023-11-26completed
+!
+2023-09-12shipped!2023-10-03shipped!2024-01-16completed
+!!2023-03-25processing	!2023-11-16completed!2023-06-21cancelled!2024-06-02shipped!2023-07-13shipped!2023-07-05shipped!2023-10-21completed!2024-01-30completed!2023-09-22shipped!2023-06-10completed
+6
+��������������yoe]TKA7-#�������������}si_VLB8/&	
+�6	5	432	1	0	/.-	,	+*)('	&	%$#"! 		
+
+				
+
+
+		
+
+
+			
+		
