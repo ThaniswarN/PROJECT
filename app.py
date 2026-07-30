@@ -14,62 +14,26 @@ import sqlite3
 
 import pandas as pd
 import streamlit as st
-from anthropic import Anthropic
+from google import genai
 
 DB_PATH = "demo.db"
-MODEL_NAME = "claude-sonnet-4-5"  # any current Claude model works here
-DEFAULT_LIMIT = 1000
-DB_PATH = "demo.db"
-MODEL_NAME = "claude-sonnet-4-5"  # any current Claude model works here
+MODEL_NAME = "gemini-2.5-flash"  # free-tier Gemini model
 DEFAULT_LIMIT = 1000
 
-import sys
-import subprocess
-
-def ensure_database():
-    """Rebuild demo.db if it's missing or corrupted (e.g. from a bad git push)."""
-    needs_rebuild = False
-    if not os.path.exists(DB_PATH):
-        needs_rebuild = True
-    else:
-        try:
-            test_conn = sqlite3.connect(DB_PATH)
-            test_conn.execute("SELECT 1 FROM customers LIMIT 1")
-            test_conn.close()
-        except Exception:
-            needs_rebuild = True
-
-    if needs_rebuild:
-        # Remove the corrupted file first -- build_db.py's DROP TABLE
-        # statements would otherwise fail against a broken file.
-        if os.path.exists(DB_PATH):
-            os.remove(DB_PATH)
-
-        result = subprocess.run(
-            [sys.executable, "build_db.py"],
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            st.error(
-                "Failed to rebuild the database automatically.\n\n"
-                f"stdout: {result.stdout}\n\nstderr: {result.stderr}"
-            )
-            st.stop()
 # ---------------------------------------------------------------------------
-# 1. Anthropic client
+# 1. Gemini client
 # ---------------------------------------------------------------------------
 
-def get_client() -> Anthropic:
-    """Create an Anthropic client using ANTHROPIC_API_KEY from the environment."""
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
+def get_client() -> genai.Client:
+    """Create a Gemini client using GEMINI_API_KEY from the environment."""
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         st.error(
-            "No ANTHROPIC_API_KEY found in the environment. "
-            "Set it before running the app, e.g. `export ANTHROPIC_API_KEY=sk-...`"
+            "No GEMINI_API_KEY found in the environment. "
+            "Set it before running the app, e.g. `export GEMINI_API_KEY=AIza...`"
         )
         st.stop()
-    return Anthropic(api_key=api_key)
+    return genai.Client(api_key=api_key)
 
 
 # ---------------------------------------------------------------------------
@@ -160,27 +124,27 @@ def _parse_llm_json(raw_text: str) -> dict:
 
 
 def nl_to_sql(
-    client: Anthropic,
+    client: genai.Client,
     schema: str,
     question: str,
     prior_error: str | None = None,
 ) -> dict:
     """
-    Calls Claude with the schema + question and returns a dict:
+    Calls Gemini with the schema + question and returns a dict:
         { "sql": str, "explanation": str, "is_safe": bool }
     """
     user_prompt = _build_user_prompt(schema, question, prior_error)
 
-    response = client.messages.create(
+    response = client.models.generate_content(
         model=MODEL_NAME,
-        max_tokens=1000,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_prompt}],
+        contents=user_prompt,
+        config={
+            "system_instruction": SYSTEM_PROMPT,
+            "max_output_tokens": 1000,
+        },
     )
 
-    raw_text = "".join(
-        block.text for block in response.content if block.type == "text"
-    )
+    raw_text = response.text or ""
 
     try:
         parsed = _parse_llm_json(raw_text)
@@ -322,7 +286,7 @@ def execute_readonly(sql: str, db_path: str = DB_PATH) -> tuple[pd.DataFrame | N
 # 5. Orchestration: NL question -> validated, executed result (with 1 retry)
 # ---------------------------------------------------------------------------
 
-def answer_question(client: Anthropic, schema: str, question: str) -> dict:
+def answer_question(client: genai.Client, schema: str, question: str) -> dict:
     """
     Full pipeline for a single user question:
       1. Ask Claude for SQL + explanation.
@@ -424,8 +388,6 @@ def answer_question(client: Anthropic, schema: str, question: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def render_ui():
-    ensure_database()
-
     st.set_page_config(
         page_title="NL → SQL Query Builder",
         page_icon="🗃️",
