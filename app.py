@@ -17,7 +17,7 @@ import streamlit as st
 from google import genai
 
 DB_PATH = "demo.db"
-MODEL_NAME = "gemini-2.5-flash"  # free-tier Gemini model
+MODEL_NAME = "gemini-3.5-flash"  # current GA flash-tier model (gemini-2.5-flash was retired for new users)
 DEFAULT_LIMIT = 1000
 import sys
 import subprocess
