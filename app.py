@@ -19,7 +19,27 @@ from anthropic import Anthropic
 DB_PATH = "demo.db"
 MODEL_NAME = "claude-sonnet-4-5"  # any current Claude model works here
 DEFAULT_LIMIT = 1000
+DB_PATH = "demo.db"
+MODEL_NAME = "claude-sonnet-4-5"  # any current Claude model works here
+DEFAULT_LIMIT = 1000
 
+import subprocess
+
+def ensure_database():
+    """Rebuild demo.db if it's missing or corrupted (e.g. from a bad git push)."""
+    needs_rebuild = False
+    if not os.path.exists(DB_PATH):
+        needs_rebuild = True
+    else:
+        try:
+            test_conn = sqlite3.connect(DB_PATH)
+            test_conn.execute("SELECT 1 FROM customers LIMIT 1")
+            test_conn.close()
+        except Exception:
+            needs_rebuild = True
+
+    if needs_rebuild:
+        subprocess.run(["python", "build_db.py"], check=True)
 # ---------------------------------------------------------------------------
 # 1. Anthropic client
 # ---------------------------------------------------------------------------
@@ -388,6 +408,8 @@ def answer_question(client: Anthropic, schema: str, question: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def render_ui():
+    ensure_database()
+
     st.set_page_config(
         page_title="NL → SQL Query Builder",
         page_icon="🗃️",
