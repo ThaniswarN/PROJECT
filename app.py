@@ -23,6 +23,7 @@ DB_PATH = "demo.db"
 MODEL_NAME = "claude-sonnet-4-5"  # any current Claude model works here
 DEFAULT_LIMIT = 1000
 
+import sys
 import subprocess
 
 def ensure_database():
@@ -39,7 +40,22 @@ def ensure_database():
             needs_rebuild = True
 
     if needs_rebuild:
-        subprocess.run(["python", "build_db.py"], check=True)
+        # Remove the corrupted file first -- build_db.py's DROP TABLE
+        # statements would otherwise fail against a broken file.
+        if os.path.exists(DB_PATH):
+            os.remove(DB_PATH)
+
+        result = subprocess.run(
+            [sys.executable, "build_db.py"],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            st.error(
+                "Failed to rebuild the database automatically.\n\n"
+                f"stdout: {result.stdout}\n\nstderr: {result.stderr}"
+            )
+            st.stop()
 # ---------------------------------------------------------------------------
 # 1. Anthropic client
 # ---------------------------------------------------------------------------
