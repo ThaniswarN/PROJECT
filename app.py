@@ -19,7 +19,37 @@ from google import genai
 DB_PATH = "demo.db"
 MODEL_NAME = "gemini-2.5-flash"  # free-tier Gemini model
 DEFAULT_LIMIT = 1000
+import sys
+import subprocess
 
+def ensure_database():
+    """Rebuild demo.db if it's missing or corrupted (e.g. from a bad git push)."""
+    needs_rebuild = False
+    if not os.path.exists(DB_PATH):
+        needs_rebuild = True
+    else:
+        try:
+            test_conn = sqlite3.connect(DB_PATH)
+            test_conn.execute("SELECT 1 FROM customers LIMIT 1")
+            test_conn.close()
+        except Exception:
+            needs_rebuild = True
+
+    if needs_rebuild:
+        if os.path.exists(DB_PATH):
+            os.remove(DB_PATH)
+
+        result = subprocess.run(
+            [sys.executable, "build_db.py"],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            st.error(
+                "Failed to rebuild the database automatically.\n\n"
+                f"stdout: {result.stdout}\n\nstderr: {result.stderr}"
+            )
+            st.stop()
 # ---------------------------------------------------------------------------
 # 1. Gemini client
 # ---------------------------------------------------------------------------
@@ -388,6 +418,8 @@ def answer_question(client: genai.Client, schema: str, question: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def render_ui():
+    ensure_database()
+
     st.set_page_config(
         page_title="NL → SQL Query Builder",
         page_icon="🗃️",
